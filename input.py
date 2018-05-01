@@ -28,7 +28,7 @@ def __read_from_file__(file):
         row_size = len(row)
         if  row_size != matrix_size + 1:
             raise MatrixFormatError("row {0} of size {1}; should be {2}".format(idx, row_size, matrix_size + 1))
-    return matrix
+    return tuple(matrix)
 
 def __readline__(line):
-    return list(map(lambda i: int(i), line.split()))
+    return tuple(map(lambda i: int(i), line.split()))
