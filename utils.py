@@ -10,11 +10,11 @@ def get_operations(gaussian, lu):
         operations = 'nothing '
     return operations
 
-def print_matrix(matrix):
+def pretty_print(matrix):
     output = ''
     for row in matrix:
-        A, B = row[:-1], row[-1:]
+        A, B = row[0:-1], row[-1]
         for element in A:
             output += ' {: 2.2f} '.format(element)
-        output += ' |  {: 2.2f}\n'.format(B[0])
+        output += ' |  {: 2.2f}\n'.format(B)
     return output

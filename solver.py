@@ -16,7 +16,7 @@ input, output, verbose, gaussian, lu = args['input'], args['output'], args['verb
 output.write('reading from {}\nwriting to {}\ndoing {}\n'.format(input.name, output.name, utils.get_operations(gaussian, lu)))
 
 matrix = get(input)
-output.write('input matrix is\n{}'.format(utils.matrix_to_string(matrix)))
+output.write('input matrix is\n{}'.format(utils.pretty_print(matrix)))
 
 # Actuall business-logic calls here
 
