@@ -15,6 +15,6 @@ def pretty_print(matrix):
     for row in matrix:
         A, B = row[0:-1], row[-1]
         for element in A:
-            output += ' {: 2.2f} '.format(element)
-        output += ' |  {: 2.2f}\n'.format(B)
+            output += ' {:< 10.2f} '.format(element)
+        output += ' | {:< 10.2f}\n'.format(B)
     return output
