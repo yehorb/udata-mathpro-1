@@ -33,10 +33,12 @@ class GaussianEliminationError(ZeroDivisionError):
     pass
 
 def __scale_row__(row, scalar):
+    # TODO Refactor smaller functions into components or into file
     new_row = map(lambda el: el * scalar, row)
     return tuple(new_row)
 
 def __subtract_rows__(which, what):
+    # TODO Refactor smaller functions into components or into file
     def subtract(i):
         diff = which[i] - what[i]
         return diff if abs(diff) > 1e-12 else 0
@@ -44,12 +46,14 @@ def __subtract_rows__(which, what):
     return tuple(new_row)
 
 def __dot_product__(u, v):
+    # TODO Refactor smaller functions into components or into file
     def step(acc, index):
         a, b = u[index], v[index]
         return acc + a * b
     return functools.reduce(step, range(0, len(u)), 0.0)
 
 def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
+    # TODO Maybe put scale, subtract and dot-product functions here
     size = len(matrix)
     if verbose:
         output.write('starting elimination phase\n')
@@ -80,7 +84,6 @@ def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
     return reduced_matrix
 
 def __back_substitution_phase__(reduced_matrix, verbose=False, output=sys.stdout):
-    print(reduced_matrix[2][2])
     size = len(reduced_matrix) - 1
     if verbose:
         output.write('starting back substitution phase\n')
