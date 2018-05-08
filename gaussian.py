@@ -1,5 +1,4 @@
 import sys
-
 import utils
 import functools
 
@@ -22,6 +21,7 @@ def elimination(matrix, verbose=False, output=sys.stdout):
         output.write('gaussian elimination error: {}\n'.format(gee))
         sys.exit(65)
     except Exception as ex:
+        # TODO Write to output
         print('unexpected exception: {}'.format(ex))
         sys.exit(1)
 
@@ -32,34 +32,38 @@ class GaussianEliminationError(ZeroDivisionError):
     '''
     pass
 
+# TODO Move these functions to matrix_ops file
 def __scale_row__(row, scalar):
-    # TODO Refactor smaller functions into components or into file
     new_row = map(lambda el: el * scalar, row)
     return tuple(new_row)
 
+# TODO Move these functions to matrix_ops file
 def __subtract_rows__(which, what):
-    # TODO Refactor smaller functions into components or into file
     def subtract(i):
         diff = which[i] - what[i]
         return diff if abs(diff) > 1e-12 else 0
     new_row = map(subtract, range(0, len(which)))
     return tuple(new_row)
 
-def __dot_product__(u, v):
-    # TODO Refactor smaller functions into components or into file
+# TODO Move these functions to matrix_ops file
+def __dot_product__(vector_a, vector_b):
+    if len(vector_a) != len(vector_b):
+        raise ArithmeticError('vector_a, vector_b of sizes {}, {}; should be the same'.format(len(vector_a), len(vector_b)))
     def step(acc, index):
-        a, b = u[index], v[index]
+        a, b = vector_a[index], vector_b[index]
         return acc + a * b
-    return functools.reduce(step, range(0, len(u)), 0.0)
+    return functools.reduce(step, range(0, len(vector_a)), 0)
 
+# TODO Maybe put scale, subtract and dot-product functions here
 def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
-    # TODO Maybe put scale, subtract and dot-product functions here
     size = len(matrix)
     if verbose:
         output.write('starting elimination phase\n')
     def step(matrix, index):
+        # TODO Move these functions to matrix_ops file
         def pivot(matrix):
             leave, sort = matrix[0:index], matrix[index:]
+            # TODO Use abs() for largest absolute value
             return leave + tuple(sorted(sort, key=lambda t: (t[index:])[0], reverse=True))
         pivoted_matrix = pivot(matrix)
         if verbose:

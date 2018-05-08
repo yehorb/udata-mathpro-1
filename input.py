@@ -1,7 +1,7 @@
 import sys
 from numpy import linalg
 
-def get(file, output):
+def get(file, output=sys.stdout):
     '''
     Reads matrix data from specified file. Logs errors to output.
     '''
@@ -28,6 +28,7 @@ class MatrixFormatError(Exception):
     '''
     pass
 
+# TODO Refactor for returning A and B separately
 def __read_from_file__(file):
     matrix = []
     for line in file:
