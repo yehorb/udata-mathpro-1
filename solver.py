@@ -3,6 +3,7 @@ import argparse
 from input import get
 import utils
 import gaussian
+import lu
 
 parser = argparse.ArgumentParser(description='Matrice solver 101.', epilog='Happy solving!')
 parser.add_argument('input', nargs='?', default=sys.stdin, type=argparse.FileType('r'), help='specify where to get data')
@@ -22,6 +23,8 @@ matrix = get(input, output)
 
 if do_gaussian:
     gaussian.elimination(matrix, verbose, output)
+if do_lu:
+    lu.decomposition(matrix, verbose, output)
 
 input.close()
 output.close()

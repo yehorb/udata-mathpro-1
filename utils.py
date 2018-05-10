@@ -13,8 +13,18 @@ def get_operations(gaussian, lu):
 def pretty_print(matrix):
     output = ''
     for row in matrix:
+        # if len(row) == len(matrix):
+        #     A, B = row, None
+        # else:
+        #     A, B = row[0:-1], row[-1]
+        # for element in A:
+        #     output += ' {:< 10.2f} '.format(element)
+        # if B:
+        #     output += ' | {:< 10.2f} '.format(B)
+        # output += '\n'
         A, B = row[0:-1], row[-1]
         for element in A:
             output += ' {:< 10.2f} '.format(element)
-        output += ' | {:< 10.2f}\n'.format(B)
+        output += ' | {:< 10.2f} '.format(B)
+        output += '\n'
     return output

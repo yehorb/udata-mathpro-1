@@ -1,7 +1,8 @@
 import sys
-
 import utils
 import functools
+import itertools
+import operator
 
 def elimination(matrix, verbose=False, output=sys.stdout):
     '''
@@ -15,13 +16,15 @@ def elimination(matrix, verbose=False, output=sys.stdout):
         reduced_matrix = __elimination_phase__(matrix, verbose, output)
         output.write('reduced matrix:\n')
         output.write(utils.pretty_print(reduced_matrix))
-        xs = __back_substitution_phase__(reduced_matrix, verbose, output)
+        reduced_matrix, x = tuple(map(lambda m: m[:-1], reduced_matrix)), tuple(map(lambda m: m[-1], reduced_matrix))
+        xs = bakckward(reduced_matrix, x, verbose, output)
         output.write('solution (x-vector): {}\n'.format(xs))
         output.write('gaussian elimination finished\n')
     except GaussianEliminationError as gee:
         output.write('gaussian elimination error: {}\n'.format(gee))
         sys.exit(65)
     except Exception as ex:
+        # TODO Write to output
         print('unexpected exception: {}'.format(ex))
         sys.exit(1)
 
@@ -32,34 +35,35 @@ class GaussianEliminationError(ZeroDivisionError):
     '''
     pass
 
+# TODO Move these functions to matrix_ops file
 def __scale_row__(row, scalar):
-    # TODO Refactor smaller functions into components or into file
-    new_row = map(lambda el: el * scalar, row)
-    return tuple(new_row)
+    return tuple(map(operator.mul, row, itertools.repeat(scalar)))
 
+# TODO Move these functions to matrix_ops file
 def __subtract_rows__(which, what):
-    # TODO Refactor smaller functions into components or into file
-    def subtract(i):
-        diff = which[i] - what[i]
+    if len(which) != len(what):
+        raise ArithmeticError('rows of sizes {}, {}; should be the same'.format(len(which), len(what)))
+    def sub(a, b):
+        diff = a - b
         return diff if abs(diff) > 1e-12 else 0
-    new_row = map(subtract, range(0, len(which)))
-    return tuple(new_row)
+    return tuple(tuple(map(sub, which, what)))
 
-def __dot_product__(u, v):
-    # TODO Refactor smaller functions into components or into file
-    def step(acc, index):
-        a, b = u[index], v[index]
-        return acc + a * b
-    return functools.reduce(step, range(0, len(u)), 0.0)
+# TODO Move these functions to matrix_ops file
+def __dot_product__(vector_a, vector_b):
+    if len(vector_a) != len(vector_b):
+        raise ArithmeticError('vectors of sizes {}, {}; should be the same'.format(len(vector_a), len(vector_b)))
+    return sum(map(operator.mul, vector_a, vector_b))
 
+# TODO Maybe put scale, subtract and dot-product functions here
 def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
-    # TODO Maybe put scale, subtract and dot-product functions here
     size = len(matrix)
     if verbose:
         output.write('starting elimination phase\n')
     def step(matrix, index):
+        # TODO Move these functions to matrix_ops file. Use pivot function from outside
         def pivot(matrix):
             leave, sort = matrix[0:index], matrix[index:]
+            # TODO Use abs() for largest absolute value
             return leave + tuple(sorted(sort, key=lambda t: (t[index:])[0], reverse=True))
         pivoted_matrix = pivot(matrix)
         if verbose:
@@ -75,7 +79,7 @@ def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
                     raise GaussianEliminationError('encoutered zero element a[{0}][{0}]'.format(index + 1))
                 scale = row[index] / pivot_row[index]
                 return __subtract_rows__(row, __scale_row__(pivot_row, scale))
-        numbered_rows = zip(range(0, size), pivoted_matrix)
+        numbered_rows = enumerate(pivoted_matrix)
         reduced_matrix = map(nullify, tuple(numbered_rows))
         return tuple(reduced_matrix)
     reduced_matrix = functools.reduce(step, range(0, size), matrix)
@@ -83,19 +87,20 @@ def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
         output.write('elimination phase finished\n')
     return reduced_matrix
 
-def __back_substitution_phase__(reduced_matrix, verbose=False, output=sys.stdout):
+# TODO Move to core?
+def bakckward(reduced_matrix, x, verbose=False, output=sys.stdout):
     size = len(reduced_matrix) - 1
     if verbose:
         output.write('starting back substitution phase\n')
     def step(xs, index):
-        b_element = (reduced_matrix[index])[-1]
+        b_element = x[index]
         a_element = (reduced_matrix[index])[index]
         if a_element == 0:
             raise GaussianEliminationError('encoutered zero element a[{0}][{0}]'.format(index + 1))
         if index == size:
             x_element = b_element / a_element
         else:
-            row = (reduced_matrix[index])[index + 1:-1]
+            row = (reduced_matrix[index])[index + 1:]
             x_element = (b_element - __dot_product__(row, xs)) / a_element
         xss = (x_element,) + xs
         if verbose:
