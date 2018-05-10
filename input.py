@@ -9,8 +9,6 @@ def get(file, output=sys.stdout):
         if file == sys.stdin:
             output.write('print matrix line by line. when finished, enter EOF character from new line (^Z)\n')
         matrix = __read_from_file__(file)
-        control = [a[0:-1] for a in matrix]
-        output.write('matrix det: {}\n'.format(linalg.det(control)))
         return matrix
     except MatrixFormatError as mfe:
         output.write('invalid matrix in file \'{0}\': {1}\n'.format(file.name, mfe))
@@ -21,6 +19,8 @@ def get(file, output=sys.stdout):
     except Exception as ex:
         output.write('unexpected exception: {0}\n'.format(ex))
         sys.exit(1)
+    finally:
+        file.close()
 
 class MatrixFormatError(Exception):
     '''

@@ -26,5 +26,4 @@ if do_gaussian:
 if do_lu:
     lu.decomposition(matrix, verbose, output)
 
-input.close()
 output.close()
