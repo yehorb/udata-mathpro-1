@@ -4,10 +4,9 @@ from input import get
 import sys
 import utils
 import functools
-import operator
 
 def __transpose__(matrix):
-    return tuple(zip(*__shrink__(matrix)))
+    return tuple(zip(*matrix))
 
 def __shrink__(matrix):
     return matrix if len(matrix) == len(matrix[0]) else tuple(map(lambda i: i[:-1], matrix))
@@ -27,85 +26,82 @@ def mult_matrix(matrix_a, matrix_b):
         return tuple(multiplied_matrix)
     return functools.reduce(step, range(0, len(matrix_a)), matrix_a)
 
-a = get(open('data/matrix_a.in'))
-b = get(open('data/matrix_l.in'))
-a = __shrink__(a)
-b = __shrink__(b)
-c = mult_matrix(a,b)
-
 def pivot(matrix):
     def step(matrix, index):
         leave, sort = matrix[0:index], matrix[index:]
         return leave + tuple(sorted(sort, key=lambda t: abs((t[index:])[0]), reverse=True))
     return functools.reduce(step, range(len(matrix)), matrix)
 
-# TODO Refactor this shit as i will forget all i wrote ovetnight
+# TODO Look up and think about better solution
 def pivot_matrix(matrix):
-    def step(element, _):
+    def step(element, index):
         pivots, indexed_matrix = element
-        step_matrix = tuple(map(operator.itemgetter(1), indexed_matrix))
-        pivot = max(__transpose__(step_matrix)[0], key=lambda e: abs(e))
-        index = tuple(filter(lambda e: pivot in e[1], indexed_matrix))[0][0]
-        index_row = tuple(map(lambda i: float(i == index), range(0, len(matrix))))
-        next_matrix = tuple(map(lambda e: (e[0], e[1][1:len(e[1])]), filter(lambda e: pivot not in e[1], indexed_matrix)))
+        step_indeces, step_matrix = tuple(map(lambda e: e[0], indexed_matrix)), tuple(map(lambda e: e[1][index:], indexed_matrix))
+        max_index, _ = max(zip(step_indeces, __transpose__(step_matrix)[0]), key=lambda e: abs(e[1]))
+        index_row = tuple(map(lambda i: float(i == max_index), range(0, len(matrix))))
+        next_matrix = tuple(filter(lambda e: e[0] != max_index, indexed_matrix))
         return (pivots + (index_row,), next_matrix)
     pivots, _ = functools.reduce(step, range(0, len(matrix)), ((), tuple(enumerate(matrix))))
     return pivots
 
-def pivot_matrix_old(M):
-    '''Returns the pivoting matrix for M, used in Doolittle's method.'''
-    size = len(M)
-    # Create an identity matrix, with floating point values                                                                                                                                                                                            
-    id_mat = [[float(i == j) for i in range(size)] for j in range(size)]
-    # print(utils.pretty_print(id_mat))
+def lu_decomposition(input_matrix, pivot=None):
+    '''Performs an LU Decomposition of matrix (which must be square) into P * matrix = L * U. The function returns P, L and U.'''
+    size = len(input_matrix)
 
-    # Rearrange the identity matrix such that the largest element of                                                                                                                                                                                   
-    # each column of M is placed on the diagonal of M                                                                                                                                                                                               
-    for j in range(size):
-        def pick(i):
-            a = abs(M[i][j])
-            # print(a)
-            return a
-        row = max(range(j, size), key=pick)
-        # print(row)
-        if j != row:
-            # Swap the rows
-            id_mat[j], id_mat[row] = id_mat[row], id_mat[j]
-            # print(id_mat)
+    # TODO Generate matrices from otutside
+    # Create zero matrices for L and U
+    L = [[float(e == i) for e in range(0, size)] for i in range(0, size)]
+    U = [[0.0] * size for i in range(size)]
 
-    return tuple(map(lambda e: tuple(e), id_mat))
+    # Create the pivot matrix pivots and the multipled matrix pivoted_matrix
+    matrix = __transpose__(mult_matrix(pivot, input_matrix)) if pivot else __transpose__(input_matrix)
 
-print(utils.pretty_print(c))
-# print(utils.pretty_print(pivot_matrix_old(c)))
-print(utils.pretty_print(pivot_matrix(c)))
-print(utils.pretty_print(mult_matrix(pivot_matrix(c), c)))
+    def step(element, index):
+        l, u = element
+        print('on step {}'.format(index + 1))
+        def transform_u(curr_u, curr_index):
+            def set_u_element(element):
+                u_index, u_element = element
+                print('on calc of u', matrix[index][curr_index], __transpose__(l)[curr_index], curr_u[index])
+                return \
+                    matrix[index][curr_index] - __dot_product__(__transpose__(l)[curr_index], curr_u[index]) \
+                    if u_index == curr_index else u_element
+            def set_u_column(element):
+                u_index, u_column = element 
+                return \
+                    tuple(map(set_u_element, enumerate(u_column))) \
+                    if u_index == index else u_column
+            return tuple( map(set_u_column, enumerate(curr_u)) )
+        next_u = functools.reduce(transform_u, range(0, index + 1), u)
+        def transform_l(curr_l, curr_index):
+            def set_l_element(element):
+                l_index, l_element = element
+                return \
+                    (matrix[index][curr_index] - __dot_product__(__transpose__(curr_l)[curr_index], next_u[index])) / next_u[index][index] \
+                    if l_index == curr_index else l_element
+            def set_l_column(element):
+                l_index, l_column = element 
+                return \
+                    tuple(map(set_l_element, enumerate(l_column))) \
+                    if l_index == index else l_column
+            return tuple( map(set_l_column, enumerate(curr_l)) )
+        next_l = functools.reduce(transform_l, range(index + 1, size), l)
+        return(next_l, next_u)
+    
+    f_l, f_u = functools.reduce(step, range(0, size), (L, U))
+    so_l = __transpose__(f_l)
+    so_u = __transpose__(f_u)
+    so_a = mult_matrix(so_l, so_u)
+    print(utils.pretty_print(so_l))
+    print(utils.pretty_print(so_u))
+    print(utils.pretty_print(so_a))
 
-def lu_decomposition(A):
-    """Performs an LU Decomposition of A (which must be square)                                                                                                                                                                                        
-    into PA = LU. The function returns P, L and U."""
-    n = len(A)
+a = __shrink__(get(open('data/lu.in')))
 
-    # Create zero matrices for L and U                                                                                                                                                                                                                 
-    L = [[0.0] * n for i in range(n)]
-    U = [[0.0] * n for i in range(n)]
+# print(utils.pretty_print(a))
+# print(utils.pretty_print(pivot_matrix(c)))
+# print(utils.pretty_print(mult_matrix(pivot_matrix(c), c)))
 
-    # Create the pivot matrix P and the multipled matrix PA                                                                                                                                                                                            
-    P = pivot_matrix(A)
-    PA = mult_matrix(P, A)
-
-    # Perform the LU Decomposition                                                                                                                                                                                                                     
-    for j in range(n):
-        # All diagonal entries of L are set to unity                                                                                                                                                                                                   
-        L[j][j] = 1.0
-
-        # LaTeX: u_{ij} = a_{ij} - \sum_{k=1}^{i-1} u_{kj} l_{ik}                                                                                                                                                                                      
-        for i in range(j+1):
-            s1 = sum(U[k][j] * L[i][k] for k in range(i))
-            U[i][j] = PA[i][j] - s1
-
-        # LaTeX: l_{ij} = \frac{1}{u_{jj}} (a_{ij} - \sum_{k=1}^{j-1} u_{kj} l_{ik} )                                                                                                                                                                  
-        for i in range(j, n):
-            s2 = sum(U[k][j] * L[i][k] for k in range(j))
-            L[i][j] = (PA[i][j] - s2) / U[j][j]
-
-    return (P, L, U)
+print('pivot and transform')
+print(utils.pretty_print(a))
+lu_decomposition(a)

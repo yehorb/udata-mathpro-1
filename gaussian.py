@@ -1,6 +1,8 @@
 import sys
 import utils
 import functools
+import itertools
+import operator
 
 def elimination(matrix, verbose=False, output=sys.stdout):
     '''
@@ -34,25 +36,22 @@ class GaussianEliminationError(ZeroDivisionError):
 
 # TODO Move these functions to matrix_ops file
 def __scale_row__(row, scalar):
-    new_row = map(lambda el: el * scalar, row)
-    return tuple(new_row)
+    return tuple(map(operator.mul, row, itertools.repeat(scalar)))
 
 # TODO Move these functions to matrix_ops file
 def __subtract_rows__(which, what):
-    def subtract(i):
-        diff = which[i] - what[i]
+    if len(which) != len(what):
+        raise ArithmeticError('rows of sizes {}, {}; should be the same'.format(len(which), len(what)))
+    def sub(a, b):
+        diff = a - b
         return diff if abs(diff) > 1e-12 else 0
-    new_row = map(subtract, range(0, len(which)))
-    return tuple(new_row)
+    return tuple(tuple(map(sub, which, what)))
 
 # TODO Move these functions to matrix_ops file
 def __dot_product__(vector_a, vector_b):
     if len(vector_a) != len(vector_b):
-        raise ArithmeticError('vector_a, vector_b of sizes {}, {}; should be the same'.format(len(vector_a), len(vector_b)))
-    def step(acc, index):
-        a, b = vector_a[index], vector_b[index]
-        return acc + a * b
-    return functools.reduce(step, range(0, len(vector_a)), 0)
+        raise ArithmeticError('vectors of sizes {}, {}; should be the same'.format(len(vector_a), len(vector_b)))
+    return sum(map(operator.mul, vector_a, vector_b))
 
 # TODO Maybe put scale, subtract and dot-product functions here
 def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
@@ -79,7 +78,7 @@ def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
                     raise GaussianEliminationError('encoutered zero element a[{0}][{0}]'.format(index + 1))
                 scale = row[index] / pivot_row[index]
                 return __subtract_rows__(row, __scale_row__(pivot_row, scale))
-        numbered_rows = zip(range(0, size), pivoted_matrix)
+        numbered_rows = enumerate(pivoted_matrix)
         reduced_matrix = map(nullify, tuple(numbered_rows))
         return tuple(reduced_matrix)
     reduced_matrix = functools.reduce(step, range(0, size), matrix)
