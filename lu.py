@@ -1,9 +1,7 @@
-# TODO Fix import after moving
-from input import get
 import sys
-import utils
 import functools
 
+import utils
 import common
 import ops
 

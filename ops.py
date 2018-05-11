@@ -36,12 +36,12 @@ def mult_matrix(matrix_a, matrix_b):
         return tuple(multiplied_matrix)
     return functools.reduce(step, range(0, len(matrix_a)), matrix_a)
 
-def forward(lower_matrix, x, verbose=False, output=sys.stdout):
+def forward(lower_matrix, b, verbose=False, output=sys.stdout):
     size = len(lower_matrix)
     if verbose:
         output.write('starting back substitution phase\n')
     def step(xs, index):
-        b_element = x[index]
+        b_element = b[index]
         a_element = (lower_matrix[index])[index]
         if a_element == 0:
             raise gaussian.GaussianEliminationError('encoutered zero element a[{0}][{0}]'.format(index + 1))
@@ -60,12 +60,12 @@ def forward(lower_matrix, x, verbose=False, output=sys.stdout):
         output.write('forward substitution phase finished\n')
     return xs
 
-def bakckward(upper_matrix, x, verbose=False, output=sys.stdout):
+def bakckward(upper_matrix, b, verbose=False, output=sys.stdout):
     size = len(upper_matrix) - 1
     if verbose:
         output.write('starting back substitution phase\n')
     def step(xs, index):
-        b_element = x[index]
+        b_element = b[index]
         a_element = (upper_matrix[index])[index]
         if a_element == 0:
             raise gaussian.GaussianEliminationError('encoutered zero element a[{0}][{0}]'.format(index + 1))

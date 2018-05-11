@@ -1,9 +1,7 @@
 import sys
-import utils
 import functools
-import itertools
-import operator
 
+import utils
 import common
 import ops
 

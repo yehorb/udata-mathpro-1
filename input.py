@@ -1,5 +1,4 @@
 import sys
-from numpy import linalg
 
 def get(file, output=sys.stdout):
     '''
@@ -7,7 +6,7 @@ def get(file, output=sys.stdout):
     '''
     try:
         if file == sys.stdin:
-            output.write('print matrix line by line. when finished, enter EOF character from new line (^Z)\n')
+            output.write('print matrix line by line. when finished, enter EOF character from new line (^Z or ^D)\n')
         matrix = __read_from_file__(file)
         return matrix
     except MatrixFormatError as mfe:
@@ -28,7 +27,6 @@ class MatrixFormatError(Exception):
     '''
     pass
 
-# TODO Refactor for returning A and B separately
 def __read_from_file__(file):
     matrix = []
     for line in file:
