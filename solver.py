@@ -1,10 +1,8 @@
 import sys
 import argparse
 
-from input import get
-import utils
-import gaussian
-import lu
+from core.input import get
+from core import utils, gaussian, lu
 
 parser = argparse.ArgumentParser(description='Matrice solver 101.', epilog='Happy solving!')
 parser.add_argument('input', nargs='?', default=sys.stdin, type=argparse.FileType('r'), help='specify where to get data')

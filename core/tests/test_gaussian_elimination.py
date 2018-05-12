@@ -1,7 +1,6 @@
 import unittest
 
-import input
-import gaussian
+from core import input, gaussian
 
 class test_gaussian_elimintaion(unittest.TestCase):
     def test_matrix_a(self):

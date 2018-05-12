@@ -3,8 +3,8 @@ import operator
 import itertools
 import functools
 
-import gaussian
-import utils
+from core import utils
+from core import gaussian
 
 def scale_row(row, scalar):
     return tuple(map(operator.mul, row, itertools.repeat(scalar)))

@@ -1,8 +1,8 @@
 import sys
 import functools
 
-import utils
-import functions
+from core import utils
+from core import functions
 
 def elimination(matrix, verbose=False, output=sys.stdout):
     '''

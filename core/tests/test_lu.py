@@ -1,8 +1,6 @@
 import unittest
 
-import input
-import lu
-import utils
+from core import input, utils, lu
 
 class test_lu(unittest.TestCase):
     def test_decomposition_a(self):

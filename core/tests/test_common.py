@@ -1,7 +1,6 @@
 import unittest
 
-import input
-import gaussian
+from core import input
 
 class test_common(unittest.TestCase):
     def test_read_a(self):
