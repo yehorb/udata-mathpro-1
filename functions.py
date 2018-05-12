@@ -4,7 +4,7 @@ import itertools
 import functools
 
 import gaussian
-import common
+import utils
 
 def scale_row(row, scalar):
     return tuple(map(operator.mul, row, itertools.repeat(scalar)))
@@ -26,7 +26,7 @@ def mult_matrix(matrix_a, matrix_b):
     '''Multiply square matrices or matrice and vector of same dimension M and N.'''
     if len(matrix_a[0]) != len(matrix_b):
         raise ValueError('cant multiply non-uniform matrices')
-    b_columns = common.transpose(matrix_b) if isinstance(matrix_b[0], tuple) else (matrix_b,)
+    b_columns = utils.transpose(matrix_b) if isinstance(matrix_b[0], tuple) else (matrix_b,)
     def step(matrix, index):
         numbered_rows = zip(range(0, len(matrix)), matrix)
         def multiply(element):
@@ -90,7 +90,7 @@ def pivot_matrix(matrix):
     def step(element, index):
         pivots, indexed_matrix = element
         step_indeces, step_matrix = tuple(map(lambda e: e[0], indexed_matrix)), tuple(map(lambda e: e[1][index:], indexed_matrix))
-        max_index, _ = max(zip(step_indeces, common.transpose(step_matrix)[0]), key=lambda e: abs(e[1]))
+        max_index, _ = max(zip(step_indeces, utils.transpose(step_matrix)[0]), key=lambda e: abs(e[1]))
         index_row = tuple(map(lambda i: float(i == max_index), range(0, len(matrix))))
         next_matrix = tuple(filter(lambda e: e[0] != max_index, indexed_matrix))
         return (pivots + (index_row,), next_matrix)

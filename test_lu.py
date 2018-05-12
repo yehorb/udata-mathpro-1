@@ -2,12 +2,12 @@ import unittest
 
 import input
 import lu
-import common
+import utils
 
 class test_lu(unittest.TestCase):
     def test_decomposition_a(self):
         matrix = input.get(open('data/matrix_a.in'))
-        matrix, x = common.split(matrix)
+        matrix, x = utils.split(matrix)
         expected_l = ((1.0, 0.0, 0.0, 0.0), (-1.5, 1.0, 0.0, 0.0), (-0.5, 4/3, 1.0, 0.0), (0.5, -1/3, 2.0, 1.0))
         expected_u = ((2.0, 2.0, -1.0, 1.0), (0.0, 3.0, 1.5, 1.5), (0.0, 0.0, 0.5, 0.5), (0.0, 0.0, 0.0, 3.0))
         expected_x = (4.0, -2.0, 1.0, 0.0)
@@ -18,7 +18,7 @@ class test_lu(unittest.TestCase):
         self.__compare_vectors__(expected_x, actual_x)
     def test_decomposition_g(self):
         matrix = input.get(open('data/matrix_g.in'))
-        matrix, _ = common.split(matrix)
+        matrix, _ = utils.split(matrix)
         with self.assertRaises(ZeroDivisionError):
             _, _ = lu.lu_decomposition(matrix)
 

@@ -21,7 +21,7 @@ def get(file, output=sys.stdout):
     finally:
         file.close()
 
-class MatrixFormatError(Exception):
+class MatrixFormatError(ValueError):
     '''
     Inapropriate matrix format.
     '''
