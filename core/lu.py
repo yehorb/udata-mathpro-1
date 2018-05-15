@@ -20,8 +20,12 @@ def decomposition(matrix, verbose=False, output=sys.stdout):
         output.write(utils.pretty_print(l))
         output.write('matrix U:\n')
         output.write(utils.pretty_print(u))
+        inversed = inverse(l, u)
+        output.write('inversed matrix:\n')
+        output.write(utils.pretty_print(inversed))
+        cond = functions.infinity_norm(op_matrix) * functions.infinity_norm(inversed)
+        output.write('condition number: {}\n'.format(cond))
         output.write('LU decomposition finished\n')
-        # TODO Norms, inversed matrix and stuff. It's ready, just add it
     except Exception as ex:
         output.write('unexpected exception: {}\n'.format(ex))
         sys.exit(1)
@@ -31,12 +35,9 @@ def lu_decomposition(input_matrix, pivot=None, verbose=False, output=sys.stdout)
     length = len(input_matrix[0])
     if size != length:
         raise ValueError('unable to decompose non-squre matrice')
-
     s_l = utils.gen_identity(size)
     s_u = utils.get_zeroes(size)
-
     matrix = utils.transpose(functions.mult_matrix(pivot, input_matrix)) if pivot else utils.transpose(input_matrix)
-    
     def step(element, index):
         l, u = element
         if verbose:

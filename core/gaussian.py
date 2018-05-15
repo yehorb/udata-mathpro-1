@@ -16,6 +16,8 @@ def elimination(matrix, verbose=False, output=sys.stdout):
         reduced_matrix = __elimination_phase__(matrix, verbose, output)
         output.write('reduced matrix:\n')
         output.write(utils.pretty_print(reduced_matrix))
+        determinant = functions.det(reduced_matrix)
+        output.write('matrix determinant: {}\n'.format(determinant))
         xs = __back_substitution_phase__(reduced_matrix, verbose, output)
         output.write('solution (x-vector): {}\n'.format(xs))
         output.write('gaussian elimination finished\n')

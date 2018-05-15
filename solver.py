@@ -2,7 +2,7 @@ import sys
 import argparse
 
 from core.input import get
-from core import utils, gaussian, lu
+from core import utils, gaussian, lu, functions
 
 parser = argparse.ArgumentParser(description='Matrice solver 101.', epilog='Happy solving!')
 parser.add_argument('input', nargs='?', default=sys.stdin, type=argparse.FileType('r'), help='specify where to get data')
@@ -19,6 +19,12 @@ output.write('writing to {}\n'.format(output.name))
 output.write('doing {}\n'.format(utils.get_operations(do_gaussian, do_lu)))
 
 matrix = get(input, output)
+print(utils.pretty_print(matrix))
+sq, b = utils.split(matrix)
+l, u = lu.lu_decomposition(sq)
+print(functions.infinity_norm(sq))
+inv = lu.inverse(l, u)
+print(functions.infinity_norm(inv))
 
 if do_gaussian:
     gaussian.elimination(matrix, verbose, output)

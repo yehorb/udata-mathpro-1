@@ -86,7 +86,7 @@ def bakckward(upper_matrix, b, verbose=False, output=sys.stdout):
 
 def pivot_matrix(matrix):
     if len(matrix) != len(matrix[0]):
-        raise ValueError('cant calculate pivots for non-square matrix')
+        raise ValueError('can\'t calculate pivots for non-square matrix')
     def step(element, index):
         pivots, indexed_matrix = element
         step_indeces, step_matrix = tuple(map(lambda e: e[0], indexed_matrix)), tuple(map(lambda e: e[1][index:], indexed_matrix))
@@ -96,3 +96,13 @@ def pivot_matrix(matrix):
         return (pivots + (index_row,), next_matrix)
     pivots, _ = functools.reduce(step, range(0, len(matrix)), ((), tuple(enumerate(matrix))))
     return pivots
+
+def det(matrix):
+    if len(matrix) != len(matrix[0]):
+        raise ValueError('can\'t calculate determinant for non-square matrix')
+    return functools.reduce(lambda acc, index: acc * matrix[index][index], range(0, len(matrix)), 1)
+
+def infinity_norm(matrix):
+    if len(matrix) != len(matrix[0]):
+        raise ValueError('can\'t calculate norm for non-square matrix')
+    return max(map(lambda r: sum(map(abs, r)), matrix))
