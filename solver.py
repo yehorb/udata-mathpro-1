@@ -14,21 +14,16 @@ parser.add_argument('-l', '--lu', action='store_true', help='apply LU-decomposit
 args = vars(parser.parse_args())
 input, output, verbose, do_gaussian, do_lu = args['input'], args['output'], args['verbose'], args['gaussian'], args['lu']
 
-output.write('reading from {}\n'.format(input.name))
-output.write('writing to {}\n'.format(output.name))
-output.write('doing {}\n'.format(utils.get_operations(do_gaussian, do_lu)))
+output.write(f'reading from {input.name}\n')
+output.write(f'writing to {output.name}\n')
+output.write(f'doing {utils.get_operations(do_gaussian, do_lu)}\n')
 
 matrix = get(input, output)
-print(utils.pretty_print(matrix))
-sq, b = utils.split(matrix)
-l, u = lu.lu_decomposition(sq)
-print(functions.infinity_norm(sq))
-inv = lu.inverse(l, u)
-print(functions.infinity_norm(inv))
 
 if do_gaussian:
     gaussian.elimination(matrix, verbose, output)
 if do_lu:
     lu.decomposition(matrix, verbose, output)
 
-output.close()
+if output is not sys.stdout:
+    output.close()

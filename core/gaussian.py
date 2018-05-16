@@ -16,16 +16,16 @@ def elimination(matrix, verbose=False, output=sys.stdout):
         reduced_matrix = __elimination_phase__(matrix, verbose, output)
         output.write('reduced matrix:\n')
         output.write(utils.pretty_print(reduced_matrix))
-        determinant = functions.det(reduced_matrix)
-        output.write('matrix determinant: {}\n'.format(determinant))
+        determinant = functions.det(utils.split(reduced_matrix)[0])
+        output.write(f'matrix determinant: {determinant}\n')
         xs = __back_substitution_phase__(reduced_matrix, verbose, output)
-        output.write('solution (x-vector): {}\n'.format(xs))
+        output.write(f'solution (x-vector): {xs}\n')
         output.write('gaussian elimination finished\n')
     except GaussianEliminationError as gee:
-        output.write('gaussian elimination error: {}\n'.format(gee))
+        output.write(f'gaussian elimination error: {gee}\n')
         sys.exit(65)
     except Exception as ex:
-        output.write('unexpected exception: {}\n'.format(ex))
+        output.write(f'unexpected exception: {ex}\n')
         sys.exit(1)
 
 class GaussianEliminationError(ZeroDivisionError):
@@ -46,7 +46,7 @@ def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
     pivoted_matrix = utils.stich(pivoted_m, pivoted_b)
     def step(matrix, index):
         if verbose:
-            output.write('step {}/{}:\n'.format(index, size - 1))
+            output.write(f'step {index}/{size - 1}:\n')
             output.write(utils.pretty_print(matrix))
         pivot_row = matrix[index]
         def nullify(element):
@@ -55,7 +55,7 @@ def __elimination_phase__(matrix, verbose=False, output=sys.stdout):
                 return row
             else:
                 if pivot_row[index] == 0:
-                    raise GaussianEliminationError('encoutered zero element a[{0}][{0}]'.format(index + 1))
+                    raise GaussianEliminationError(f'encoutered zero element a[{index + 1}][{index + 1}]')
                 scale = row[index] / pivot_row[index]
                 return functions.subtract_rows(row, functions.scale_row(pivot_row, scale))
         reduced_matrix = map(nullify, enumerate(matrix)) 
