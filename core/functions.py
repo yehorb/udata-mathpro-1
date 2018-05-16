@@ -44,7 +44,7 @@ def forward(lower_matrix, b, verbose=False, output=sys.stdout):
         b_element = b[index]
         a_element = (lower_matrix[index])[index]
         if a_element == 0:
-            raise gaussian.GaussianEliminationError('encoutered zero element a[{0}][{0}]'.format(index + 1))
+            raise gaussian.GaussianEliminationError(f'encoutered zero element a[{index + 1}][{index + 1}]')
         if index == 0:
             x_element = b_element / a_element
         else:
@@ -52,8 +52,8 @@ def forward(lower_matrix, b, verbose=False, output=sys.stdout):
             x_element = (b_element - dot_product(row, xs)) / a_element
         xss = xs + (x_element,)
         if verbose:
-            output.write('step {}/{}:\n'.format(size - index, size))
-            output.write('current x\'s: {}\n'.format(xss))
+            output.write(f'step {size - index}/{size}:\n')
+            output.write(f'current x\'s: {xss}\n')
         return xss
     xs = functools.reduce(step, range(0, size), ())
     if verbose:
@@ -68,7 +68,7 @@ def bakckward(upper_matrix, b, verbose=False, output=sys.stdout):
         b_element = b[index]
         a_element = (upper_matrix[index])[index]
         if a_element == 0:
-            raise gaussian.GaussianEliminationError('encoutered zero element a[{0}][{0}]'.format(index + 1))
+            raise gaussian.GaussianEliminationError(f'encoutered zero element a[{index + 1}][{index + 1}]')
         if index == size:
             x_element = b_element / a_element
         else:
@@ -76,8 +76,8 @@ def bakckward(upper_matrix, b, verbose=False, output=sys.stdout):
             x_element = (b_element - dot_product(row, xs)) / a_element
         xss = (x_element,) + xs
         if verbose:
-            output.write('step {}/{}:\n'.format(size - index, size))
-            output.write('current x\'s: {}\n'.format(xss))
+            output.write(f'step {size - index}/{size}:\n')
+            output.write(f'current x\'s: {xss}\n')
         return xss
     xs = functools.reduce(step, range(size, -1, -1), ())
     if verbose:
